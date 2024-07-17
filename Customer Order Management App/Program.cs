@@ -1,7 +1,15 @@
+using Customer_Order_Management_App.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//Registering Connection String
+var provider = builder.Services.BuildServiceProvider();
+var config = provider.GetRequiredService<IConfiguration>();
+builder.Services.AddDbContext<CustomerDbContext>(item => item.UseSqlServer(config.GetConnectionString("dbcs")));
 
 var app = builder.Build();
 
