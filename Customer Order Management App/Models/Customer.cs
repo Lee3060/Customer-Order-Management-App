@@ -6,6 +6,7 @@ namespace Customer_Order_Management_App.Models
     public class Customer
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustmerId { get; set; }
 
         [Column(TypeName = "varchar(100)")]

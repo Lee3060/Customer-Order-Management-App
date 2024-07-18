@@ -6,6 +6,8 @@ namespace Customer_Order_Management_App.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly CustomerDbContext customerDb;
+
         //private readonly ILogger<HomeController> _logger;
 
         //public HomeController(ILogger<HomeController> logger)
@@ -13,9 +15,15 @@ namespace Customer_Order_Management_App.Controllers
         //    _logger = logger;
         //}
 
+        public HomeController(CustomerDbContext customerDb)
+        {
+            this.customerDb = customerDb;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            var custData = customerDb.Customers.ToList();
+            return View(custData);
         }
 
         public IActionResult Privacy()
