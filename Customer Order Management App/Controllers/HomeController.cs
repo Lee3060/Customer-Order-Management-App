@@ -139,6 +139,7 @@ namespace Customer_Order_Management_App.Controllers
                         throw;
                     }
                 }
+                TempData["insert_success"] = "Inserted....";
                 return RedirectToAction("Index");
             }
 
@@ -188,6 +189,7 @@ namespace Customer_Order_Management_App.Controllers
             {
                 customerDb.Customers.Update(cust);
                 await customerDb.SaveChangesAsync();
+                TempData["update_success"] = "Updated....";
                 return RedirectToAction("Index", "Home");   
             }
             return View(cust);
@@ -216,6 +218,7 @@ namespace Customer_Order_Management_App.Controllers
                 customerDb.Customers.Remove(custData);
             }
             await customerDb.SaveChangesAsync();
+            TempData["delete_success"] = "Deleted....";
             return RedirectToAction("Index", "Home");
         }
 
