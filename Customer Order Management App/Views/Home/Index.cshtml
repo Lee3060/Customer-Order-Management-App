@@ -49,7 +49,8 @@
                 @Html.DisplayFor(modelItem => item.ProductName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.OrderDate)
+                @* @Html.DisplayFor(modelItem => item.OrderDate) *@
+                    @item.OrderDate.ToString("dd/MM/yyyy")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.OrderId)

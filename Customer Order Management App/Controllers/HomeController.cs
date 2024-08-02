@@ -90,6 +90,31 @@ namespace Customer_Order_Management_App.Controllers
             return View(cust);
         }
 
+        public async Task<IActionResult> Delete(int id)
+        {
+            if(id == null || customerDb.Customers == null)
+            {
+                return NotFound();
+            }
+            var custData = await customerDb.Customers.FirstOrDefaultAsync(x => x.CustmerId == id);
+            if (custData == null)
+            {
+                return NotFound();
+            }
+            return View(custData);
+        }
+
+        [HttpPost,ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var custData = await customerDb.Customers.FindAsync(id);
+            if(custData != null)
+            {
+                customerDb.Customers.Remove(custData);
+            }
+            await customerDb.SaveChangesAsync();
+            return RedirectToAction("Index", "Home");
+        }
 
         public IActionResult Privacy()
         {
