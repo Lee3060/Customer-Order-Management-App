@@ -29,22 +29,125 @@ namespace Customer_Order_Management_App.Controllers
             return View(custData);
         }
 
+
+        //private int GetNextCustomerId()
+        //{
+        //    var existingIds = customerDb.Customers.Select(c => c.CustmerId).OrderBy(id => id).ToList();
+
+        //    // If there are no existing IDs, start with 1
+        //    if (existingIds.Count == 0)
+        //    {
+        //        return 1;
+        //    }
+
+        //    // Find the smallest missing ID
+        //    for (int i = 1; i <= existingIds.Count; i++)
+        //    {
+        //        if (existingIds[i - 1] != i)
+        //        {
+        //            return i;
+        //        }
+        //    }
+
+        //    // If there are no gaps, return the next ID after the highest
+        //    return existingIds.Count + 1;
+        //}
+        private int GetNextCustomerId()
+        {
+            return customerDb.Customers.Any() ? customerDb.Customers.Max(c => c.CustmerId) + 1 : 1;
+        }
+
+
+
+
         public IActionResult Create()
         {
             return View();
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Create(Customer cust)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        await customerDb.Customers.AddAsync(cust);
+        //        await customerDb.SaveChangesAsync();
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    return View(cust);
+        //}
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Create(Customer cust)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        using (var transaction = customerDb.Database.BeginTransaction())
+        //        {
+        //            try
+        //            {
+        //                // Generate the next available CustomerId
+        //                cust.CustmerId = GetNextCustomerId();
+        //                customerDb.Database.ExecuteSqlRaw("SET IDENTITY_INSERT dbo.Customers ON");
+        //                customerDb.Customers.Add(cust);
+        //                customerDb.SaveChanges();
+        //                customerDb.Database.ExecuteSqlRaw("SET IDENTITY_INSERT dbo.Customers OFF");
+        //                transaction.Commit();
+        //            }
+        //            catch (Exception)
+        //            {
+        //                transaction.Rollback();
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction("Index","Home");
+        //    }
+
+        //    return View(cust);
+        //}
+
+
         [HttpPost]
-        public async Task<IActionResult> Create(Customer cust)
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Customer cust)
         {
             if (ModelState.IsValid)
             {
-                await customerDb.Customers.AddAsync(cust);
-                await customerDb.SaveChangesAsync();
-                return RedirectToAction("Index", "Home");
+                using (var transaction = customerDb.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        // Generate the next available CustomerId
+                        cust.CustmerId = GetNextCustomerId();
+
+                        // Enable IDENTITY_INSERT for the Customers table
+                        customerDb.Database.ExecuteSqlRaw("SET IDENTITY_INSERT dbo.Customers ON");
+
+                        customerDb.Customers.Add(cust);
+                        customerDb.SaveChanges();
+
+                        // Disable IDENTITY_INSERT for the Customers table
+                        customerDb.Database.ExecuteSqlRaw("SET IDENTITY_INSERT dbo.Customers OFF");
+
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index");
             }
+
             return View(cust);
         }
+
+
+
+
 
         public async Task<IActionResult> Details(int? id)  //Due to ? if id can be null
         {

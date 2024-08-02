@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Humanizer;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Customer_Order_Management_App.Models
@@ -6,7 +7,6 @@ namespace Customer_Order_Management_App.Models
     public class Customer
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustmerId { get; set; }
 
         [Column(TypeName = "varchar(100)")]
@@ -29,3 +29,10 @@ namespace Customer_Order_Management_App.Models
         public int OrderId { get; set; }
     }
 }
+
+
+//In an ASP.NET MVC application, when you delete a customer and add a new one, 
+//    the CustomerId is auto-incremented by default and does not reuse the IDs 
+//    of the deleted customers. This behavior is due to the 
+//    DatabaseGeneratedOption.Identity option, which instructs the database to 
+//    automatically generate the values for the CustomerId column.
