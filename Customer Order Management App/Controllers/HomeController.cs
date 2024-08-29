@@ -111,11 +111,11 @@ namespace Customer_Order_Management_App.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Customer cust)
+        public async Task<IActionResult> Create(Customer cust)
         {
             if (ModelState.IsValid)
             {
-                using (var transaction = customerDb.Database.BeginTransaction())
+                await using (var transaction = await customerDb.Database.BeginTransactionAsync())
                 {
                     try
                     {
@@ -123,19 +123,19 @@ namespace Customer_Order_Management_App.Controllers
                         cust.CustmerId = GetNextCustomerId();
 
                         // Enable IDENTITY_INSERT for the Customers table
-                        customerDb.Database.ExecuteSqlRaw("SET IDENTITY_INSERT dbo.Customers ON");
+                        await customerDb.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Customers ON");
 
-                        customerDb.Customers.Add(cust);
-                        customerDb.SaveChanges();
+                        await customerDb.Customers.AddAsync(cust);
+                        await customerDb.SaveChangesAsync();
 
                         // Disable IDENTITY_INSERT for the Customers table
-                        customerDb.Database.ExecuteSqlRaw("SET IDENTITY_INSERT dbo.Customers OFF");
+                        await customerDb.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Customers OFF");
 
-                        transaction.Commit();
+                        await transaction.CommitAsync();
                     }
                     catch (Exception)
                     {
-                        transaction.Rollback();
+                        await transaction.RollbackAsync();
                         throw;
                     }
                 }
@@ -179,6 +179,7 @@ namespace Customer_Order_Management_App.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(int? id, Customer cust)
         {
             if(id != cust.CustmerId)
@@ -210,6 +211,7 @@ namespace Customer_Order_Management_App.Controllers
         }
 
         [HttpPost,ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var custData = await customerDb.Customers.FindAsync(id);
